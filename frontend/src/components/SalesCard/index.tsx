@@ -5,6 +5,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { BASE_URL } from '../../utils/request';
+import { Sale } from '../../models/sale';
 
 function SalesCard() {
 
@@ -14,11 +16,13 @@ function SalesCard() {
     const [minDate, setMinDate] = useState(min);
     const [maxData, setMaxDate] = useState(max);
 
-    useEffect(()=> {
-        axios.get("http://localhost:8080/sales")
-        .then(response => {
-            console.log(response.data)
-        })
+    const [sales, setSales] = useState<Sale[]>();
+
+    useEffect(() => {
+        axios.get(`${BASE_URL}/sales`)
+            .then(response => {
+                setSales(response.data.content)
+            })
     }, []);
 
     return (
@@ -56,45 +60,23 @@ function SalesCard() {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td className="disappear-after-992px">#241</td>
-                            <td className="disappear-after-576px">July / 08 / 2022</td>
-                            <td>Kris</td>
-                            <td className="disappear-after-992px">15</td>
-                            <td className="disappear-after-992px">11</td>
-                            <td>$ 55300.00</td>
-                            <td>
-                                <div className="dsmeta-red-button-container">
-                                    <NotificationButton />
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td className="disappear-after-992px">#333</td>
-                            <td className="disappear-after-576px">July / 08 / 2022</td>
-                            <td>Stefan</td>
-                            <td className="disappear-after-992px">20</td>
-                            <td className="disappear-after-992px">15</td>
-                            <td>$ 63500.00</td>
-                            <td>
-                                <div className="dsmeta-red-button-container">
-                                    <NotificationButton />
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td className="disappear-after-992px">#465</td>
-                            <td className="disappear-after-576px">July / 08 / 2022</td>
-                            <td>Logan</td>
-                            <td className="disappear-after-992px">10</td>
-                            <td className="disappear-after-992px">8</td>
-                            <td>$ 52800.00</td>
-                            <td>
-                                <div className="dsmeta-red-button-container">
-                                    <NotificationButton />
-                                </div>
-                            </td>
-                        </tr>
+                        {sales?.map(sale => {
+                            return (
+                                <tr key={sale.id}>
+                                    <td className="disappear-after-992px">#{sale.id}</td>
+                                    <td className="disappear-after-576px">{new Date(sale.date).toLocaleDateString()}</td>
+                                    <td>{sale.sellerName}</td>
+                                    <td className="disappear-after-992px">{sale.visited}</td>
+                                    <td className="disappear-after-992px">{sale.deals}</td>
+                                    <td>{sale.amount.toFixed(2)}</td>
+                                    <td>
+                                        <div className="dsmeta-red-button-container">
+                                            <NotificationButton />
+                                        </div>
+                                    </td>
+                                </tr>
+                            )
+                        })}
                     </tbody>
                 </table>
             </div>
